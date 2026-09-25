@@ -13,11 +13,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        :root {
+        /* الثيمات اللونية الديناميكية */
+        :root, html[data-theme="cyber"] {
             --bg-space: #050711;
-            --accent-cyan: #06b6d4;
-            --accent-indigo: #6366f1;
-            --accent-pink: #ec4899;
+            --accent-primary: #38bdf8;
+            --accent-secondary: #6366f1;
+            --accent-highlight: #ec4899;
+            --glow-color-1: rgba(99, 102, 241, 0.4);
+            --glow-color-2: rgba(236, 72, 153, 0.35);
+            --glow-color-3: #38bdf8;
+        }
+
+        html[data-theme="matrix"] {
+            --bg-space: #030a05;
+            --accent-primary: #22c55e;
+            --accent-secondary: #10b981;
+            --accent-highlight: #a3e635;
+            --glow-color-1: rgba(16, 185, 129, 0.4);
+            --glow-color-2: rgba(34, 197, 94, 0.35);
+            --glow-color-3: #4ade80;
+        }
+
+        html[data-theme="crimson"] {
+            --bg-space: #0c0406;
+            --accent-primary: #f43f5e;
+            --accent-secondary: #e11d48;
+            --accent-highlight: #fb7185;
+            --glow-color-1: rgba(225, 29, 72, 0.4);
+            --glow-color-2: rgba(244, 63, 94, 0.35);
+            --glow-color-3: #fda4af;
+        }
+
+        html[data-theme="gold"] {
+            --bg-space: #0b0803;
+            --accent-primary: #eab308;
+            --accent-secondary: #f59e0b;
+            --accent-highlight: #facc15;
+            --glow-color-1: rgba(245, 158, 11, 0.4);
+            --glow-color-2: rgba(234, 179, 8, 0.35);
+            --glow-color-3: #fde047;
         }
 
         * {
@@ -26,6 +60,12 @@
             padding: 0;
             font-family: 'Cairo', sans-serif;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (pointer: fine) {
+            body, button, a, input, [onclick] {
+                cursor: none !important;
+            }
         }
 
         body {
@@ -38,6 +78,47 @@
             padding: 40px 15px;
             position: relative;
             overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        #customCursorDot, #customCursorRing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99999;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.2s ease;
+        }
+
+        #customCursorDot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--accent-primary);
+            box-shadow: 0 0 10px var(--accent-primary), 0 0 18px var(--accent-primary);
+        }
+
+        #customCursorRing {
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--accent-primary);
+            box-shadow: 0 0 12px var(--glow-color-1);
+            transition: width 0.18s ease-out, height 0.18s ease-out, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        #customCursorRing.hovered {
+            width: 48px;
+            height: 48px;
+            border-color: var(--accent-highlight);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 20px var(--accent-highlight);
+        }
+
+        @media (pointer: coarse) {
+            #customCursorDot, #customCursorRing {
+                display: none !important;
+            }
         }
 
         #particleCanvas {
@@ -50,18 +131,60 @@
             pointer-events: none;
         }
 
-        .ambient-glow {
+        .aurora-container {
             position: fixed;
-            width: 550px;
-            height: 550px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(236, 72, 153, 0.08) 50%, transparent 75%);
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: 1;
+            inset: 0;
             pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
         }
 
-        /* الحاوية الخارجية المتوهجة */
+        .aurora-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.65;
+            mix-blend-mode: screen;
+            animation: auroraFloat 14s infinite alternate ease-in-out;
+        }
+
+        .aurora-1 {
+            width: 550px;
+            height: 550px;
+            top: -10%;
+            left: 15%;
+            background: radial-gradient(circle, var(--glow-color-1) 0%, transparent 70%);
+            animation-duration: 12s;
+        }
+
+        .aurora-2 {
+            width: 600px;
+            height: 600px;
+            bottom: -15%;
+            right: 10%;
+            background: radial-gradient(circle, var(--glow-color-2) 0%, transparent 70%);
+            animation-duration: 16s;
+            animation-delay: -4s;
+        }
+
+        .aurora-3 {
+            width: 420px;
+            height: 420px;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, var(--glow-color-3) 0%, transparent 70%);
+            opacity: 0.25;
+            animation-duration: 10s;
+            animation-delay: -2s;
+        }
+
+        @keyframes auroraFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -35px) scale(1.15); }
+            100% { transform: translate(-30px, 30px) scale(0.9); }
+        }
+
         .outer-card-wrapper {
             position: relative;
             z-index: 2;
@@ -86,9 +209,9 @@
                 from 0deg,
                 transparent 0%,
                 transparent 60%,
-                rgba(99, 102, 241, 0.35) 75%,
-                rgba(236, 72, 153, 0.85) 90%,
-                #38bdf8 100%
+                var(--glow-color-1) 75%,
+                var(--glow-color-2) 90%,
+                var(--glow-color-3) 100%
             );
             animation: rotateCardNeon 7s linear infinite;
             filter: blur(5px);
@@ -108,28 +231,68 @@
             backdrop-filter: blur(28px);
             -webkit-backdrop-filter: blur(28px);
             border-radius: 34px;
-            padding: 42px 28px 36px;
+            padding: 44px 28px 36px;
             text-align: center;
         }
 
-        /* بادج حرف R الصغير الأنيق */
+        .top-action-bar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        html[dir="ltr"] .top-action-bar {
+            left: auto;
+            right: 20px;
+        }
+
+        .top-control-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            user-select: none;
+            transition: all 0.25s ease;
+        }
+
+        .top-control-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: var(--accent-primary);
+            transform: scale(1.05);
+        }
+
         .special-letter-badge {
             position: absolute;
-            top: 22px;
-            right: 25px;
+            top: 20px;
+            right: 22px;
             display: inline-flex;
             align-items: center;
             gap: 5px;
             background: rgba(236, 72, 153, 0.08);
             border: 1px solid rgba(236, 72, 153, 0.25);
-            padding: 3px 10px;
+            padding: 4px 11px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 900;
-            color: #f472b6;
+            color: var(--accent-highlight);
             letter-spacing: 0.5px;
             box-shadow: 0 0 12px rgba(236, 72, 153, 0.2);
             user-select: none;
+        }
+
+        html[dir="ltr"] .special-letter-badge {
+            right: auto;
+            left: 22px;
         }
 
         .special-letter-badge i {
@@ -142,19 +305,17 @@
             50% { transform: scale(1.3); opacity: 1; }
         }
 
-        /* حاوية الصورة المربعة */
         .avatar-container {
             position: relative;
             width: 210px;
             height: 210px;
-            margin: 10px auto 22px;
+            margin: 15px auto 22px;
             border-radius: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            cursor: pointer;
         }
 
         .avatar-border-spinner {
@@ -168,9 +329,9 @@
                 from 0deg,
                 transparent 0%,
                 transparent 60%,
-                rgba(99, 102, 241, 0.45) 75%,
-                rgba(236, 72, 153, 0.95) 90%,
-                #06b6d4 100%
+                var(--glow-color-1) 75%,
+                var(--glow-color-2) 90%,
+                var(--glow-color-3) 100%
             );
             animation: spinSquareGlow 4.5s linear infinite;
             filter: blur(4px);
@@ -203,7 +364,6 @@
             transform: scale(1.05);
         }
 
-        /* شارة الحالة */
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -215,9 +375,8 @@
             font-size: 13px;
             font-weight: 700;
             margin-bottom: 16px;
-            cursor: pointer;
-            transition: all 0.25s ease;
             user-select: none;
+            transition: all 0.25s ease;
         }
 
         .status-badge:hover {
@@ -229,7 +388,6 @@
             width: 8.5px;
             height: 8.5px;
             border-radius: 50%;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
             animation: pulseDot 2s infinite ease-in-out;
         }
 
@@ -278,7 +436,6 @@
             color: #818cf8;
         }
 
-        /* زر أسعار الألعاب الفخم */
         .pricing-highlight-btn {
             display: flex;
             align-items: center;
@@ -288,8 +445,6 @@
             border: 1.5px solid rgba(234, 179, 8, 0.45);
             border-radius: 18px;
             color: #fff;
-            text-decoration: none;
-            cursor: pointer;
             margin-bottom: 11px;
             transition: all 0.3s ease;
             box-shadow: 0 8px 20px -5px rgba(234, 179, 8, 0.3);
@@ -313,7 +468,6 @@
             color: #fff;
         }
 
-        /* زر بوست الضمان */
         .guarantee-btn {
             display: flex;
             align-items: center;
@@ -347,7 +501,6 @@
             color: #fff;
         }
 
-        /* زر طرق الدفع */
         .payment-highlight-btn {
             display: flex;
             align-items: center;
@@ -357,8 +510,6 @@
             border: 1.5px solid rgba(99, 102, 241, 0.35);
             border-radius: 18px;
             color: #fff;
-            text-decoration: none;
-            cursor: pointer;
             margin-bottom: 16px;
             transition: all 0.3s ease;
             box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.25);
@@ -374,6 +525,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            text-align: inherit;
         }
 
         .payment-icon-box {
@@ -388,7 +540,6 @@
             color: #fff;
         }
 
-        /* قائمة الروابط */
         .links-wrapper {
             display: flex;
             flex-direction: column;
@@ -445,8 +596,13 @@
             transition: transform 0.25s ease, color 0.25s ease;
         }
 
-        .social-button:hover .arrow-icon {
+        html[dir="rtl"] .social-button:hover .arrow-icon {
             transform: translateX(-4px);
+            color: #fff;
+        }
+
+        html[dir="ltr"] .social-button:hover .arrow-icon {
+            transform: translateX(4px);
             color: #fff;
         }
 
@@ -465,26 +621,92 @@
         .btn-facebook .icon-square { background: rgba(24, 119, 242, 0.15); color: #1877f2; }
         .btn-facebook:hover { border-color: #1877f2; box-shadow: 0 8px 20px -5px rgba(24, 119, 242, 0.25); }
 
-        /* نوافذ الـ Modal العامة */
+        .visitor-counter-box {
+            margin-top: 22px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #94a3b8;
+            user-select: none;
+        }
+
+        .visitor-counter-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 900;
+            color: var(--accent-primary);
+            letter-spacing: 1px;
+            font-family: monospace;
+            box-shadow: 0 0 10px var(--glow-color-1);
+        }
+
+        .floating-cart-trigger {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 80;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #0b1120;
+            padding: 12px 20px;
+            border-radius: 9999px;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65), 0 0 20px var(--glow-color-1);
+            user-select: none;
+            transition: all 0.25s ease;
+        }
+
+        html[dir="ltr"] .floating-cart-trigger {
+            right: auto;
+            left: 24px;
+        }
+
+        .floating-cart-trigger:hover {
+            transform: scale(1.06) translateY(-3px);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.8), 0 0 28px var(--glow-color-1);
+        }
+
+        .cart-badge-count {
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 7px;
+            border-radius: 10px;
+            border: 1.5px solid #ffffff;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.78);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            z-index: 99;
+            z-index: 500;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 15px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
         .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
+            visibility: visible;
         }
 
         .modal-card {
@@ -510,14 +732,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             flex-shrink: 0;
         }
 
         .modal-title {
-            font-size: 19px;
+            font-size: 18px;
             font-weight: 800;
             display: flex;
             align-items: center;
@@ -535,7 +757,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: all 0.2s ease;
         }
 
@@ -545,7 +766,6 @@
             border-color: #ef4444;
         }
 
-        /* تبويبات الألعاب في نافذة الأسعار */
         .tabs-header {
             display: flex;
             gap: 8px;
@@ -567,7 +787,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: #94a3b8;
             white-space: nowrap;
-            cursor: pointer;
             transition: all 0.2s ease;
         }
 
@@ -596,7 +815,7 @@
             padding: 6px 12px;
             border-radius: 10px;
             margin: 6px 0 2px;
-            text-align: right;
+            text-align: inherit;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -624,36 +843,149 @@
         }
 
         .item-price-tag {
-            font-size: 14px;
-            font-weight: 900;
-            color: #38bdf8;
-            background: rgba(56, 189, 248, 0.1);
-            padding: 3px 9px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 8px;
             border-radius: 8px;
+            white-space: nowrap;
         }
 
-        .order-action-btn {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            color: #34d399;
+        .add-to-cart-btn {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: var(--accent-primary);
             padding: 5px 12px;
             border-radius: 9px;
             font-size: 12px;
             font-weight: 800;
-            cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 5px;
         }
 
-        .order-action-btn:hover {
-            background: #10b981;
-            color: #fff;
-            transform: scale(1.04);
+        .add-to-cart-btn:hover {
+            background: var(--accent-primary);
+            color: #0b1120;
+            transform: scale(1.05);
         }
 
-        /* نافذة طرق الدفع وتنسيق اللوجوهات */
+        .cart-drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            z-index: 600;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .cart-drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            max-width: 420px;
+            background: #0b1120;
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            z-index: 601;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px 20px;
+        }
+
+        html[dir="ltr"] .cart-drawer {
+            right: auto;
+            left: 0;
+            border-left: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            transform: translateX(-100%);
+        }
+
+        .cart-drawer-overlay.active .cart-drawer {
+            transform: translateX(0);
+        }
+
+        .cart-items-scroll {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 4px;
+            margin: 16px 0;
+        }
+
+        .cart-item-card {
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-qty-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 8px;
+            border-radius: 10px;
+        }
+
+        .qty-btn {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 900;
+            padding: 0 4px;
+            transition: color 0.2s ease;
+        }
+
+        .qty-btn:hover { color: #fff; }
+
+        .cart-total-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .whatsapp-checkout-btn {
+            background: #22c55e;
+            color: #ffffff;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .whatsapp-checkout-btn:hover {
+            background: #16a34a;
+            transform: scale(1.02);
+        }
+
         .payment-methods-list {
             display: flex;
             flex-direction: column;
@@ -674,7 +1006,7 @@
             display: flex;
             align-items: center;
             gap: 13px;
-            text-align: right;
+            text-align: inherit;
         }
 
         .brand-logo-box {
@@ -715,7 +1047,6 @@
             border-radius: 10px;
             font-size: 12.5px;
             font-weight: 700;
-            cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
@@ -728,7 +1059,76 @@
             transform: scale(1.05);
         }
 
-        /* إشعار النسخ السريع */
+        /* تنسيقات كارت المشاركة ورمز QR */
+        .qr-wrapper {
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 20px;
+            width: 170px;
+            height: 170px;
+            margin: 10px auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px var(--glow-color-1);
+        }
+
+        .qr-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .share-link-input-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 4px 6px 4px 12px;
+            margin-bottom: 14px;
+        }
+
+        .share-link-input-box input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #94a3b8;
+            font-size: 13px;
+            font-family: monospace;
+            width: 100%;
+            direction: ltr;
+        }
+
+        .share-social-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .share-social-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 8px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .share-social-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-primary);
+        }
+
         #toastNotice {
             position: fixed;
             bottom: 25px;
@@ -741,7 +1141,7 @@
             font-weight: 700;
             font-size: 14px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            z-index: 1000;
+            z-index: 10000;
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
@@ -757,21 +1157,52 @@
 </head>
 <body>
 
+    <div id="customCursorDot"></div>
+    <div id="customCursorRing"></div>
+
     <canvas id="particleCanvas"></canvas>
-    <div class="ambient-glow"></div>
+
+    <div class="aurora-container">
+        <div class="aurora-blob aurora-1"></div>
+        <div class="aurora-blob aurora-2"></div>
+        <div class="aurora-blob aurora-3"></div>
+    </div>
+
+    <!-- زر السلة العائم -->
+    <div class="floating-cart-trigger" onclick="openCartDrawer()">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span data-i18n="cart_title">السلة</span>
+        <span class="cart-badge-count" id="cartBadgeCount">0</span>
+    </div>
 
     <div class="outer-card-wrapper">
         <div class="outer-card-spinner"></div>
 
         <div class="profile-card">
 
-            <!-- بادج حرف R الصغير والمضيء -->
+            <!-- شريط الأدوات العلوي مع زر المشاركة -->
+            <div class="top-action-bar">
+                <button class="top-control-btn" onclick="toggleLanguage()" title="Change Language">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="langBtnText">English</span>
+                </button>
+                <button class="top-control-btn" onclick="cycleTheme()" title="تغيير ثيم الألوان">
+                    <i class="fa-solid fa-palette"></i>
+                    <span id="themeBtnText">Cyber</span>
+                </button>
+                <button class="top-control-btn" id="soundToggleBtn" onclick="toggleSound()" title="تشغيل / كتم المؤثرات الصوتية">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+                <button class="top-control-btn" onclick="openShareModal()" title="مشاركة المتجر">
+                    <i class="fa-solid fa-share-nodes"></i>
+                </button>
+            </div>
+
             <div class="special-letter-badge" title="R">
                 <span>R</span>
                 <i class="fa-solid fa-heart"></i>
             </div>
 
-            <!-- الصورة الشخصية (محمية برمز PIN) -->
             <div class="avatar-container" onclick="requestPhotoChange()" title="تعديل الصورة الشخصية (يتطلب رمز PIN)">
                 <div class="avatar-border-spinner"></div>
                 <div class="avatar-image-wrapper">
@@ -780,16 +1211,13 @@
             </div>
             <input type="file" id="hiddenPhotoInput" accept="image/*" style="display: none;">
 
-            <!-- شارة الحالة (محمية برمز PIN) -->
             <div class="status-badge" id="statusBtn" onclick="requestAdminToggle()" title="انقر لتعديل الحالة (يتطلب رمز PIN)">
                 <span class="status-circle" id="statusCircle"></span>
                 <span id="statusText">متاح للتواصل أونلاين</span>
             </div>
 
-            <!-- الاسم -->
             <h1 class="user-name">Hassan El-Tahan</h1>
 
-            <!-- التخصصات كسطرين منفصلين -->
             <div class="roles-container">
                 <span class="role-badge badge-trusted">
                     <i class="fa-solid fa-gamepad"></i>
@@ -801,51 +1229,46 @@
                 </span>
             </div>
 
-            <!-- زر أسعار شحن الألعاب المباشر -->
             <div class="pricing-highlight-btn" onclick="openPricingModal()">
                 <div class="btn-left-content">
                     <div class="pricing-icon-box">
                         <i class="fa-solid fa-fire"></i>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 800; font-size: 14.5px;">قائمة أسعار الألعاب والشحن</div>
-                        <div style="font-size: 11.5px; color: #fde047;">ببجي، فري فاير، تيك توك، بيس، روبوكس</div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 14.5px;" data-i18n="pricing_btn_title">قائمة أسعار الألعاب والشحن</div>
+                        <div style="font-size: 11.5px; color: #fde047;" data-i18n="pricing_btn_sub">ببجي، فري فاير، تيك توك، بيس، روبوكس</div>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-left" style="font-size: 13px; color: #fde047;"></i>
+                <i class="fa-solid fa-chevron-left arrow-icon" style="font-size: 13px; color: #fde047;"></i>
             </div>
 
-            <!-- زر بوست الضمان -->
             <a href="https://www.facebook.com/share/p/1Bux4VMS79/?mibextid=wwXIfr" target="_blank" class="guarantee-btn">
                 <div class="btn-left-content">
                     <div class="guarantee-icon-box">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 800; font-size: 14.5px;">بوست الضمان وآراء العملاء</div>
-                        <div style="font-size: 11.5px; color: #a7f3d0;">اضغط هنا لمشاهدة إثباتات الثقة على فيسبوك</div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 14.5px;" data-i18n="guarantee_btn_title">بوست الضمان وآراء العملاء</div>
+                        <div style="font-size: 11.5px; color: #a7f3d0;" data-i18n="guarantee_btn_sub">اضغط هنا لمشاهدة إثباتات الثقة على فيسبوك</div>
                     </div>
                 </div>
                 <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 13px; color: #a7f3d0;"></i>
             </a>
 
-            <!-- زر طرق الدفع والمحافظ -->
             <div class="payment-highlight-btn" onclick="openPaymentModal()">
                 <div class="btn-left-content">
                     <div class="payment-icon-box">
                         <i class="fa-solid fa-wallet"></i>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 800; font-size: 14.5px;">طرق الدفع والمحافظ المتاحة</div>
-                        <div style="font-size: 11.5px; color: #cbd5e1;">انستاباي، فودافون كاش، أورنج، بينانس</div>
+                    <div>
+                        <div style="font-weight: 800; font-size: 14.5px;" data-i18n="payment_btn_title">طرق الدفع والمحافظ المتاحة</div>
+                        <div style="font-size: 11.5px; color: #cbd5e1;" data-i18n="payment_btn_sub">انستاباي، فودافون كاش، أورنج، بينانس</div>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-left" style="font-size: 13px; color: #cbd5e1;"></i>
+                <i class="fa-solid fa-chevron-left arrow-icon" style="font-size: 13px; color: #cbd5e1;"></i>
             </div>
 
-            <!-- روابط السوشيال ميديا -->
             <div class="links-wrapper">
-                <!-- واتساب -->
                 <a href="https://wa.me/201064041272" target="_blank" class="social-button btn-whatsapp">
                     <div class="btn-content-right">
                         <div class="icon-square"><i class="fa-brands fa-whatsapp"></i></div>
@@ -854,7 +1277,6 @@
                     <i class="fa-solid fa-arrow-left arrow-icon"></i>
                 </a>
 
-                <!-- تيليجرام -->
                 <a href="https://t.me/ohas00" target="_blank" class="social-button btn-telegram">
                     <div class="btn-content-right">
                         <div class="icon-square"><i class="fa-brands fa-telegram"></i></div>
@@ -863,7 +1285,6 @@
                     <i class="fa-solid fa-arrow-left arrow-icon"></i>
                 </a>
 
-                <!-- تيك توك -->
                 <a href="https://www.tiktok.com/@ta..777?_r=1&_t=ZS-99tUN77EsYW" target="_blank" class="social-button btn-tiktok">
                     <div class="btn-content-right">
                         <div class="icon-square"><i class="fa-brands fa-tiktok"></i></div>
@@ -872,7 +1293,6 @@
                     <i class="fa-solid fa-arrow-left arrow-icon"></i>
                 </a>
 
-                <!-- إنستجرام -->
                 <a href="https://instagram.com/hassan_eltahan7" target="_blank" class="social-button btn-instagram">
                     <div class="btn-content-right">
                         <div class="icon-square"><i class="fa-brands fa-instagram"></i></div>
@@ -881,7 +1301,6 @@
                     <i class="fa-solid fa-arrow-left arrow-icon"></i>
                 </a>
 
-                <!-- فيسبوك -->
                 <a href="https://facebook.com/tahanh700" target="_blank" class="social-button btn-facebook">
                     <div class="btn-content-right">
                         <div class="icon-square"><i class="fa-brands fa-facebook-f"></i></div>
@@ -891,45 +1310,124 @@
                 </a>
             </div>
 
+            <div class="visitor-counter-box">
+                <i class="fa-solid fa-eye" style="color: var(--accent-primary);"></i>
+                <span data-i18n="visitors_label">عدد الزوار:</span>
+                <span class="visitor-counter-badge" id="visitorCountDisplay">--</span>
+            </div>
+
         </div>
     </div>
 
-    <!-- نافذة منيو الأسعار (Modal) -->
+    <!-- نافذة المشاركة ورمز QR -->
+    <div class="modal-overlay" id="shareModal" onclick="closeShareOnOverlay(event)">
+        <div class="modal-card" style="max-width: 400px; text-align: center;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-qrcode" style="color: var(--accent-primary);"></i>
+                    <span data-i18n="share_modal_title">مشاركة رابط المتجر</span>
+                </div>
+                <div class="close-modal-btn" onclick="closeShareModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+            </div>
+
+            <div class="text-xs text-slate-400 mb-2" data-i18n="share_modal_sub">امسح الكود بكاميرا الموبايل لفتح الموقع فوراً</div>
+            
+            <div class="qr-wrapper">
+                <img id="qrCodeImg" src="" alt="Store QR Code">
+            </div>
+
+            <div class="share-link-input-box">
+                <input type="text" id="shareUrlInput" readonly>
+                <button class="copy-btn" onclick="copyCurrentSiteUrl()">
+                    <i class="fa-regular fa-copy"></i>
+                    <span data-i18n="copy_btn">نسخ</span>
+                </button>
+            </div>
+
+            <div class="share-social-grid">
+                <button class="share-social-btn" onclick="shareToWhatsApp()">
+                    <i class="fa-brands fa-whatsapp text-lg text-emerald-400"></i>
+                    <span>واتساب</span>
+                </button>
+                <button class="share-social-btn" onclick="shareToTelegram()">
+                    <i class="fa-brands fa-telegram text-lg text-sky-400"></i>
+                    <span>تيليجرام</span>
+                </button>
+                <button class="share-social-btn" onclick="shareNative()">
+                    <i class="fa-solid fa-share-from-square text-lg text-pink-400"></i>
+                    <span data-i18n="share_more">المزيد</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الأسعار (Modal) -->
     <div class="modal-overlay" id="pricingModal" onclick="closePricingOnOverlay(event)">
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fa-solid fa-gamepad" style="color: #facc15;"></i>
-                    أسعار شحن الألعاب
+                    <span data-i18n="pricing_modal_title">أسعار شحن الألعاب</span>
                 </div>
                 <div class="close-modal-btn" onclick="closePricingModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </div>
             </div>
 
-            <!-- تبويبات الألعاب -->
             <div class="tabs-header">
-                <button class="tab-btn active" onclick="switchGameTab('pubg', this)">ببجي (PUBG)</button>
-                <button class="tab-btn" onclick="switchGameTab('freefire', this)">فري فاير (Free Fire)</button>
-                <button class="tab-btn" onclick="switchGameTab('tiktok', this)">تيك توك (TikTok)</button>
-                <button class="tab-btn" onclick="switchGameTab('efootball', this)">بيس (eFootball)</button>
-                <button class="tab-btn" onclick="switchGameTab('roblox', this)">روبوكس (Roblox)</button>
+                <button class="tab-btn active" onclick="switchGameTab('pubg', this)" data-i18n="tab_pubg">ببجي (PUBG)</button>
+                <button class="tab-btn" onclick="switchGameTab('freefire', this)" data-i18n="tab_freefire">فري فاير (Free Fire)</button>
+                <button class="tab-btn" onclick="switchGameTab('tiktok', this)" data-i18n="tab_tiktok">تيك توك (TikTok)</button>
+                <button class="tab-btn" onclick="switchGameTab('efootball', this)" data-i18n="tab_efootball">بيس (eFootball)</button>
+                <button class="tab-btn" onclick="switchGameTab('roblox', this)" data-i18n="tab_roblox">روبوكس (Roblox)</button>
             </div>
 
-            <!-- منطقة عرض باقات اللعبة المحددة -->
-            <div class="pricing-scroll-area" id="pricingContentArea">
-                <!-- المحتوى يتغير تلقائياً بالجافاسكربت -->
-            </div>
+            <div class="pricing-scroll-area" id="pricingContentArea"></div>
         </div>
     </div>
 
-    <!-- نافذة طرق الدفع (Modal) -->
-    <div class="modal-overlay" id="paymentModal" onclick="closeModalOnOverlay(event)">
+    <!-- درج سلة المشتريات (Drawer) -->
+    <div class="cart-drawer-overlay" id="cartDrawerOverlay" onclick="closeCartOnOverlay(event)">
+        <div class="cart-drawer">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fa-solid fa-cart-shopping" style="color: var(--accent-primary);"></i>
+                    <span data-i18n="cart_drawer_title">سلة المشتريات</span>
+                </div>
+                <div class="close-modal-btn" onclick="closeCartDrawer()">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+            </div>
+
+            <div class="cart-items-scroll" id="cartItemsList"></div>
+
+            <div class="cart-total-box">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-bold text-slate-400" data-i18n="cart_total_egp">المجموع بالجنيه:</span>
+                    <span class="text-lg font-black text-sky-400" id="cartTotalEgpDisplay">0 ج</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-500" data-i18n="cart_total_usd">المجموع بالدولار:</span>
+                    <span class="text-sm font-black text-emerald-400" id="cartTotalUsdDisplay">$0.00</span>
+                </div>
+            </div>
+
+            <button class="whatsapp-checkout-btn" onclick="checkoutViaWhatsApp()">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span data-i18n="checkout_btn">إرسال الطلب عبر واتساب</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- نافذة طرق الدفع -->
+    <div class="modal-overlay" id="paymentModal" onclick="closePaymentOnOverlay(event)">
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fa-solid fa-wallet" style="color: #6366f1;"></i>
-                    طرق الدفع والشحن المعتمدة
+                    <span data-i18n="payment_modal_title">طرق الدفع والشحن المعتمدة</span>
                 </div>
                 <div class="close-modal-btn" onclick="closePaymentModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -937,7 +1435,6 @@
             </div>
 
             <div class="payment-methods-list">
-                <!-- إنستاباي -->
                 <div class="method-item">
                     <div class="method-info">
                         <div class="brand-logo-box" style="background: linear-gradient(135deg, #4c1d95, #6d28d9);">
@@ -946,16 +1443,15 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="method-name">إنستاباي (InstaPay)</div>
+                            <div class="method-name" data-i18n="pay_instapay">إنستاباي (InstaPay)</div>
                             <div class="method-value">01064041272</div>
                         </div>
                     </div>
-                    <button class="copy-btn" onclick="copyToClipboard('01064041272', 'رقم إنستاباي')">
-                        <i class="fa-regular fa-copy"></i> نسخ
+                    <button class="copy-btn" onclick="copyToClipboard('01064041272', 'رقم إنستاباي', 'InstaPay Number')">
+                        <i class="fa-regular fa-copy"></i> <span data-i18n="copy_btn">نسخ</span>
                     </button>
                 </div>
 
-                <!-- فودافون كاش -->
                 <div class="method-item">
                     <div class="method-info">
                         <div class="brand-logo-box" style="background: #e60000;">
@@ -964,16 +1460,15 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="method-name">فودافون كاش (Vodafone)</div>
+                            <div class="method-name" data-i18n="pay_vodafone">فودافون كاش (Vodafone)</div>
                             <div class="method-value">01064041272</div>
                         </div>
                     </div>
-                    <button class="copy-btn" onclick="copyToClipboard('01064041272', 'رقم فودافون كاش')">
-                        <i class="fa-regular fa-copy"></i> نسخ
+                    <button class="copy-btn" onclick="copyToClipboard('01064041272', 'رقم فودافون كاش', 'Vodafone Cash Number')">
+                        <i class="fa-regular fa-copy"></i> <span data-i18n="copy_btn">نسخ</span>
                     </button>
                 </div>
 
-                <!-- أورنج كاش -->
                 <div class="method-item">
                     <div class="method-info">
                         <div class="brand-logo-box" style="background: #ff7900;">
@@ -983,16 +1478,15 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="method-name">أورنج كاش (Orange)</div>
+                            <div class="method-name" data-i18n="pay_orange">أورنج كاش (Orange)</div>
                             <div class="method-value">01277374145</div>
                         </div>
                     </div>
-                    <button class="copy-btn" onclick="copyToClipboard('01277374145', 'رقم أورنج كاش')">
-                        <i class="fa-regular fa-copy"></i> نسخ
+                    <button class="copy-btn" onclick="copyToClipboard('01277374145', 'رقم أورنج كاش', 'Orange Cash Number')">
+                        <i class="fa-regular fa-copy"></i> <span data-i18n="copy_btn">نسخ</span>
                     </button>
                 </div>
 
-                <!-- بينانس -->
                 <div class="method-item">
                     <div class="method-info">
                         <div class="brand-logo-box" style="background: #181a20; border: 1px solid rgba(243, 186, 47, 0.4);">
@@ -1001,139 +1495,351 @@
                             </svg>
                         </div>
                         <div>
-                            <div class="method-name">منصة بينانس (Binance ID)</div>
+                            <div class="method-name" data-i18n="pay_binance">منصة بينانس (Binance ID)</div>
                             <div class="method-value">1131356421</div>
                         </div>
                     </div>
-                    <button class="copy-btn" onclick="copyToClipboard('1131356421', 'معرّف بينانس ID')">
-                        <i class="fa-regular fa-copy"></i> نسخ
+                    <button class="copy-btn" onclick="copyToClipboard('1131356421', 'معرّف بينانس ID', 'Binance ID')">
+                        <i class="fa-regular fa-copy"></i> <span data-i18n="copy_btn">نسخ</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- إشعار النسخ -->
     <div id="toastNotice">
         <i class="fa-solid fa-check-circle"></i>
         <span id="toastMsg">تم النسخ بنجاح!</span>
     </div>
 
     <script>
-        // رقم الواتساب المخصص لاستقبال طلبات شحن الألعاب
-        const ORDERS_WHATSAPP_NUMBER = "201214131679";
+        // مؤشر الجيمينج
+        const cursorDot = document.getElementById('customCursorDot');
+        const cursorRing = document.getElementById('customCursorRing');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX = mouseX, ringY = mouseY;
 
-        // رمز PIN المشترك
-        const ADMIN_PIN = "1234";
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = `${mouseX}px`;
+            cursorDot.style.top = `${mouseY}px`;
+        });
 
-        // قاعدة بيانات باقات الألعاب
+        function animateCursorRing() {
+            ringX += (mouseX - ringX) * 0.18;
+            ringY += (mouseY - ringY) * 0.18;
+            cursorRing.style.left = `${ringX}px`;
+            cursorRing.style.top = `${ringY}px`;
+            requestAnimationFrame(animateCursorRing);
+        }
+        animateCursorRing();
+
+        function refreshCursorHoverTargets() {
+            document.querySelectorAll('button, a, .tab-btn, .social-button, .pricing-highlight-btn, .guarantee-btn, .payment-highlight-btn, .avatar-container, .status-badge, .floating-cart-trigger').forEach(el => {
+                el.addEventListener('mouseenter', () => cursorRing.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursorRing.classList.remove('hovered'));
+            });
+        }
+        refreshCursorHoverTargets();
+
+        // محرك المؤثرات الصوتية
+        let audioCtx = null;
+        let isSoundEnabled = localStorage.getItem('tahan_sound_fx') !== 'disabled';
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playCyberClick() {
+            if (!isSoundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(580, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(840, audioCtx.currentTime + 0.06);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            } catch(e) {}
+        }
+
+        function playSuccessSound() {
+            if (!isSoundEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(1040, now + 0.12);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } catch(e) {}
+        }
+
+        function updateSoundUI() {
+            const icon = document.getElementById('soundIcon');
+            if (isSoundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-red-400';
+            }
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            localStorage.setItem('tahan_sound_fx', isSoundEnabled ? 'enabled' : 'disabled');
+            updateSoundUI();
+            if (isSoundEnabled) playCyberClick();
+        }
+        updateSoundUI();
+
+        const USD_FIXED_RATE = 50.0;
+        const ORDERS_WHATSAPP_NUMBER = "201064041272";
+        const ADMIN_PIN = "2092007";
+
+        const themesList = ['cyber', 'matrix', 'crimson', 'gold'];
+        const themeDisplayNames = { cyber: 'Cyber', matrix: 'Matrix', crimson: 'Crimson', gold: 'Gold' };
+        let currentTheme = localStorage.getItem('tahan_theme') || 'cyber';
+
+        function applyTheme(themeKey) {
+            currentTheme = themeKey;
+            document.documentElement.setAttribute('data-theme', themeKey);
+            localStorage.setItem('tahan_theme', themeKey);
+            document.getElementById('themeBtnText').innerText = themeDisplayNames[themeKey];
+        }
+
+        function cycleTheme() {
+            playCyberClick();
+            const nextIdx = (themesList.indexOf(currentTheme) + 1) % themesList.length;
+            applyTheme(themesList[nextIdx]);
+        }
+        applyTheme(currentTheme);
+
+        let currentLang = localStorage.getItem('tahan_site_lang') || 'ar';
+        const i18nTranslations = {
+            ar: {
+                langBtn: 'English',
+                onlineStatus: 'متاح للتواصل أونلاين',
+                offlineStatus: 'غير متاح حالياً',
+                pricing_btn_title: 'قائمة أسعار الألعاب والشحن',
+                pricing_btn_sub: 'ببجي، فري فاير، تيك توك، بيس، روبوكس',
+                guarantee_btn_title: 'بوست الضمان وآراء العملاء',
+                guarantee_btn_sub: 'اضغط هنا لمشاهدة إثباتات الثقة على فيسبوك',
+                payment_btn_title: 'طرق الدفع والمحافظ المتاحة',
+                payment_btn_sub: 'انستاباي، فودافون كاش، أورنج، بينانس',
+                pricing_modal_title: 'أسعار شحن الألعاب',
+                tab_pubg: 'ببجي (PUBG)',
+                tab_freefire: 'فري فاير (Free Fire)',
+                tab_tiktok: 'تيك توك (TikTok)',
+                tab_efootball: 'بيس (eFootball)',
+                tab_roblox: 'روبوكس (Roblox)',
+                payment_modal_title: 'طرق الدفع والشحن المعتمدة',
+                pay_instapay: 'إنستاباي (InstaPay)',
+                pay_vodafone: 'فودافون كاش (Vodafone)',
+                pay_orange: 'أورنج كاش (Orange)',
+                pay_binance: 'منصة بينانس (Binance ID)',
+                copy_btn: 'نسخ',
+                add_to_cart: 'إضافة +',
+                cart_title: 'السلة',
+                cart_drawer_title: 'سلة المشتريات',
+                cart_total_egp: 'المجموع بالجنيه:',
+                cart_total_usd: 'المجموع بالدولار:',
+                checkout_btn: 'إرسال الطلب عبر واتساب',
+                cart_empty: 'السلة فارغة حالياً',
+                visitors_label: 'عدد الزوار:',
+                share_modal_title: 'مشاركة رابط المتجر',
+                share_modal_sub: 'امسح الكود بكاميرا الموبايل لفتح الموقع فوراً',
+                share_more: 'المزيد'
+            },
+            en: {
+                langBtn: 'عربي',
+                onlineStatus: 'Available Online',
+                offlineStatus: 'Currently Unavailable',
+                pricing_btn_title: 'Gaming Top-Up Price List',
+                pricing_btn_sub: 'PUBG, Free Fire, TikTok, eFootball, Roblox',
+                guarantee_btn_title: 'Trust & Customer Reviews',
+                guarantee_btn_sub: 'Click to view customer feedback on Facebook',
+                payment_btn_title: 'Accepted Payment Methods',
+                payment_btn_sub: 'InstaPay, Vodafone Cash, Orange, Binance',
+                pricing_modal_title: 'Game Top-Up Prices',
+                tab_pubg: 'PUBG Mobile',
+                tab_freefire: 'Free Fire',
+                tab_tiktok: 'TikTok',
+                tab_efootball: 'eFootball',
+                tab_roblox: 'Roblox',
+                payment_modal_title: 'Accepted Payment Methods',
+                pay_instapay: 'InstaPay',
+                pay_vodafone: 'Vodafone Cash',
+                pay_orange: 'Orange Cash',
+                pay_binance: 'Binance (Pay ID)',
+                copy_btn: 'Copy',
+                add_to_cart: 'Add +',
+                cart_title: 'Cart',
+                cart_drawer_title: 'Shopping Cart',
+                cart_total_egp: 'Total EGP:',
+                cart_total_usd: 'Total USD:',
+                checkout_btn: 'Checkout via WhatsApp',
+                cart_empty: 'Your cart is empty',
+                visitors_label: 'Visitors:',
+                share_modal_title: 'Share Store Link',
+                share_modal_sub: 'Scan with mobile camera to visit instantly',
+                share_more: 'More'
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.documentElement.lang = lang;
+            localStorage.setItem('tahan_site_lang', lang);
+
+            document.getElementById('langBtnText').innerText = i18nTranslations[lang].langBtn;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18nTranslations[lang][key]) el.innerText = i18nTranslations[lang][key];
+            });
+
+            document.querySelectorAll('.arrow-icon').forEach(icon => {
+                if (lang === 'ar') {
+                    if (icon.classList.contains('fa-chevron-right')) icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                    if (icon.classList.contains('fa-arrow-right')) icon.classList.replace('fa-arrow-right', 'fa-arrow-left');
+                } else {
+                    if (icon.classList.contains('fa-chevron-left')) icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                    if (icon.classList.contains('fa-arrow-left')) icon.classList.replace('fa-arrow-left', 'fa-arrow-right');
+                }
+            });
+
+            updateStatusUI();
+            if (document.getElementById('pricingModal').classList.contains('active')) {
+                renderPricingItems(currentActiveGame);
+            }
+            renderCartItems();
+        }
+
+        function toggleLanguage() {
+            playCyberClick();
+            setLanguage(currentLang === 'ar' ? 'en' : 'ar');
+        }
+
+        // قاعدة بيانات الألعاب
         const gamesData = {
             pubg: [
-                { type: 'header', title: 'أسعار PUBG ID' },
-                { name: '35 شدة', price: '35 ج' },
-                { name: '60 شدة', price: '60 ج' },
-                { name: '325 شدة', price: '250 ج' },
-                { name: '385 شدة', price: '310 ج' },
-                { name: '660 شدة', price: '490 ج' },
-                { name: '720 شدة', price: '540 ج' },
-                { name: '1800 شدة', price: '1200 ج' },
-                { name: '3850 شدة', price: '2400 ج' },
-                { name: '8100 شدة', price: '4500 ج' },
-                { name: '16200 شدة', price: '9000 ج' },
-                { type: 'header', title: 'أسعار PUBG QR' },
-                { name: '60 شدة (QR)', price: '60 ج' },
-                { name: '230 شدة (QR)', price: '230 ج' },
-                { name: '385 شدة (QR)', price: '290 ج' },
-                { name: '650 شدة (QR)', price: '450 ج' },
-                { name: '710 شدة (QR)', price: '500 ج' },
-                { name: '1100 شدة (QR)', price: '1100 ج' },
-                { name: '2150 شدة (QR)', price: '2150 ج' },
-                { name: '4300 شدة (QR)', price: '4300 ج' },
-                { name: '16200 شدة (QR)', price: '8500 ج' },
-                { type: 'header', title: 'عروض الازدهار والاشتراكات' },
-                { name: 'الانضمام الأول', price: '60 ج' },
-                { name: 'الانضمام الثاني', price: '160 ج' },
-                { name: 'الانضمام الثالث', price: '255 ج' },
-                { name: 'برايم عادي', price: '70 ج' },
-                { name: 'برايم بلس', price: '480 ج' }
+                { type: 'header', title: 'أسعار PUBG ID', title_en: 'PUBG Mobile ID Prices' },
+                { id: 'p_35', name: '35 شدة', name_en: '35 UC', egp: 35 },
+                { id: 'p_60', name: '60 شدة', name_en: '60 UC', egp: 60 },
+                { id: 'p_325', name: '325 شدة', name_en: '325 UC', egp: 250 },
+                { id: 'p_385', name: '385 شدة', name_en: '385 UC', egp: 310 },
+                { id: 'p_660', name: '660 شدة', name_en: '660 UC', egp: 490 },
+                { id: 'p_720', name: '720 شدة', name_en: '720 UC', egp: 540 },
+                { id: 'p_1800', name: '1800 شدة', name_en: '1800 UC', egp: 1200 },
+                { id: 'p_3850', name: '3850 شدة', name_en: '3850 UC', egp: 2400 },
+                { id: 'p_8100', name: '8100 شدة', name_en: '8100 UC', egp: 4500 },
+                { id: 'p_16200', name: '16200 شدة', name_en: '16200 UC', egp: 9000 },
+                { type: 'header', title: 'أسعار PUBG QR', title_en: 'PUBG Mobile QR Prices' },
+                { id: 'pq_60', name: '60 شدة (QR)', name_en: '60 UC (QR)', egp: 60 },
+                { id: 'pq_230', name: '230 شدة (QR)', name_en: '230 UC (QR)', egp: 230 },
+                { id: 'pq_385', name: '385 شدة (QR)', name_en: '385 UC (QR)', egp: 290 },
+                { id: 'pq_650', name: '650 شدة (QR)', name_en: '650 UC (QR)', egp: 450 },
+                { id: 'pq_710', name: '710 شدة (QR)', name_en: '710 UC (QR)', egp: 500 },
+                { id: 'pq_1100', name: '1100 شدة (QR)', name_en: '1100 UC (QR)', egp: 1100 },
+                { id: 'pq_2150', name: '2150 شدة (QR)', name_en: '2150 UC (QR)', egp: 2150 },
+                { id: 'pq_4300', name: '4300 شدة (QR)', name_en: '4300 UC (QR)', egp: 4300 },
+                { id: 'pq_16200', name: '16200 شدة (QR)', name_en: '16200 UC (QR)', egp: 8500 },
+                { type: 'header', title: 'عروض الازدهار والاشتراكات', title_en: 'Subscriptions & Passes' },
+                { id: 'p_sub1', name: 'الانضمام الأول', name_en: 'First Join', egp: 60 },
+                { id: 'p_sub2', name: 'الانضمام الثاني', name_en: 'Second Join', egp: 160 },
+                { id: 'p_sub3', name: 'الانضمام الثالث', name_en: 'Third Join', egp: 255 },
+                { id: 'p_prm', name: 'برايم عادي', name_en: 'Prime', egp: 70 },
+                { id: 'p_prm_plus', name: 'برايم بلس', name_en: 'Prime Plus', egp: 480 }
             ],
             freefire: [
-                { type: 'header', title: 'أسعار شحن Free Fire بالأيدي (ID)' },
-                { name: '110 جوهرة', price: '60 ج' },
-                { name: '231 جوهرة', price: '120 ج' },
-                { name: '341 جوهرة', price: '165 ج' },
-                { name: '462 جوهرة', price: '220 ج' },
-                { name: '583 جوهرة', price: '275 ج' },
-                { name: '1045 جوهرة', price: '470 ج' },
-                { name: '1188 جوهرة', price: '530 ج' },
-                { name: '2002 جوهرة', price: '900 ج' },
-                { name: '3003 جوهرة', price: '1300 ج' },
-                { name: '4070 جوهرة', price: '1800 ج' },
-                { name: '5071 جوهرة', price: '2450 ج' },
-                { name: '10021 جوهرة', price: '4300 ج' },
-                { type: 'header', title: 'أسعار فري فاير (حساب)' },
-                { name: '110 جوهرة (حساب)', price: '60 ج' },
-                { name: '310 جوهرة (حساب)', price: '145 ج' },
-                { name: '520 جوهرة (حساب)', price: '210 ج' },
-                { name: '1060 جوهرة (حساب)', price: '380 ج' },
-                { name: '2180 جوهرة (حساب)', price: '750 ج' },
-                { name: '3240 جوهرة (حساب)', price: '1130 ج' },
-                { name: '5600 جوهرة (حساب)', price: '1800 ج' },
-                { name: '11200 جوهرة (حساب)', price: '3550 ج' },
-                { type: 'header', title: 'العضويات والعروض الخاصة' },
-                { name: 'العضوية الأسبوعية +100', price: '125 ج' },
-                { name: 'العضوية الشهرية +500', price: '530 ج' },
-                { name: 'أسبوعي (حساب) +100', price: '85 ج' },
-                { name: 'شهري (حساب) +500', price: '380 ج' },
-                { name: 'مخفف +30', price: '40 ج' },
-                { name: 'دروب 1', price: '50 ج' },
-                { name: 'دروب 2', price: '100 ج' },
-                { name: 'باقة المستوى (ID)', price: '200 ج' },
-                { name: 'عرض مستوى يوصلك 1270', price: '200 ج' }
+                { type: 'header', title: 'أسعار شحن Free Fire بالأيدي (ID)', title_en: 'Free Fire ID Top-up' },
+                { id: 'ff_110', name: '110 جوهرة', name_en: '110 Diamonds', egp: 60 },
+                { id: 'ff_231', name: '231 جوهرة', name_en: '231 Diamonds', egp: 120 },
+                { id: 'ff_341', name: '341 جوهرة', name_en: '341 Diamonds', egp: 165 },
+                { id: 'ff_462', name: '462 جوهرة', name_en: '462 Diamonds', egp: 220 },
+                { id: 'ff_583', name: '583 جوهرة', name_en: '583 Diamonds', egp: 275 },
+                { id: 'ff_1045', name: '1045 جوهرة', name_en: '1045 Diamonds', egp: 470 },
+                { id: 'ff_1188', name: '1188 جوهرة', name_en: '1188 Diamonds', egp: 530 },
+                { id: 'ff_2002', name: '2002 جوهرة', name_en: '2002 Diamonds', egp: 900 },
+                { id: 'ff_3003', name: '3003 جوهرة', name_en: '3003 Diamonds', egp: 1300 },
+                { id: 'ff_4070', name: '4070 جوهرة', name_en: '4070 Diamonds', egp: 1800 },
+                { id: 'ff_5071', name: '5071 جوهرة', name_en: '5071 Diamonds', egp: 2450 },
+                { id: 'ff_10021', name: '10021 جوهرة', name_en: '10021 Diamonds', egp: 4300 },
+                { type: 'header', title: 'أسعار فري فاير (حساب)', title_en: 'Free Fire Account Login' },
+                { id: 'ff_acc_110', name: '110 جوهرة (حساب)', name_en: '110 Diamonds (Login)', egp: 60 },
+                { id: 'ff_acc_310', name: '310 جوهرة (حساب)', name_en: '310 Diamonds (Login)', egp: 145 },
+                { id: 'ff_acc_520', name: '520 جوهرة (حساب)', name_en: '520 Diamonds (Login)', egp: 210 },
+                { id: 'ff_acc_1060', name: '1060 جوهرة (حساب)', name_en: '1060 Diamonds (Login)', egp: 380 },
+                { id: 'ff_acc_2180', name: '2180 جوهرة (حساب)', name_en: '2180 Diamonds (Login)', egp: 750 },
+                { id: 'ff_acc_3240', name: '3240 جوهرة (حساب)', name_en: '3240 Diamonds (Login)', egp: 1130 },
+                { id: 'ff_acc_5600', name: '5600 جوهرة (حساب)', name_en: '5600 Diamonds (Login)', egp: 1800 },
+                { id: 'ff_acc_11200', name: '11200 جوهرة (حساب)', name_en: '11200 Diamonds (Login)', egp: 3550 },
+                { type: 'header', title: 'العضويات والعروض الخاصة', title_en: 'Memberships & Special Drops' },
+                { id: 'ff_w', name: 'العضوية الأسبوعية +100', name_en: 'Weekly Membership +100', egp: 125 },
+                { id: 'ff_m', name: 'العضوية الشهرية +500', name_en: 'Monthly Membership +500', egp: 530 },
+                { id: 'ff_w_acc', name: 'أسبوعي (حساب) +100', name_en: 'Weekly (Login) +100', egp: 85 },
+                { id: 'ff_m_acc', name: 'شهري (حساب) +500', name_en: 'Monthly (Login) +500', egp: 380 },
+                { id: 'ff_dr1', name: 'دروب 1', name_en: 'Airdrop Tier 1', egp: 50 },
+                { id: 'ff_dr2', name: 'دروب 2', name_en: 'Airdrop Tier 2', egp: 100 },
+                { id: 'ff_lvl', name: 'باقة المستوى (ID)', name_en: 'Level Up Pass (ID)', egp: 200 }
             ],
             tiktok: [
-                { type: 'header', title: 'أسعار عملات TikTok' },
-                { name: '70 عملة', price: '60 ج' },
-                { name: '200 عملة', price: '140 ج' },
-                { name: '350 عملة', price: '230 ج' },
-                { name: '500 عملة', price: '300 ج' },
-                { name: '700 عملة', price: '440 ج' },
-                { name: '1000 عملة', price: '580 ج' },
-                { name: '2000 عملة', price: '1150 ج' },
-                { name: '3000 عملة', price: '1730 ج' },
-                { name: '4000 عملة', price: '2290 ج' },
-                { name: '5000 عملة', price: '2900 ج' }
+                { type: 'header', title: 'أسعار عملات TikTok', title_en: 'TikTok Coins Rates' },
+                { id: 'tt_70', name: '70 عملة', name_en: '70 Coins', egp: 60 },
+                { id: 'tt_200', name: '200 عملة', name_en: '200 Coins', egp: 140 },
+                { id: 'tt_350', name: '350 عملة', name_en: '350 Coins', egp: 230 },
+                { id: 'tt_500', name: '500 عملة', name_en: '500 Coins', egp: 300 },
+                { id: 'tt_700', name: '700 عملة', name_en: '700 Coins', egp: 440 },
+                { id: 'tt_1000', name: '1000 عملة', name_en: '1000 Coins', egp: 580 },
+                { id: 'tt_2000', name: '2000 عملة', name_en: '2000 Coins', egp: 1150 },
+                { id: 'tt_3000', name: '3000 عملة', name_en: '3000 Coins', egp: 1730 },
+                { id: 'tt_5000', name: '5000 عملة', name_en: '5000 Coins', egp: 2900 }
             ],
             efootball: [
-                { type: 'header', title: 'أسعار كوينز eFootball' },
-                { name: '130 كوين', price: '70 ج' },
-                { name: '300 كوين', price: '150 ج' },
-                { name: '550 كوين', price: '250 ج' },
-                { name: '750 كوين', price: '340 ج' },
-                { name: '1040 كوين', price: '450 ج' },
-                { name: '2130 كوين', price: '890 ج' },
-                { name: '3250 كوين', price: '1300 ج' },
-                { name: '5700 كوين', price: '2150 ج' },
-                { name: '12800 كوين', price: '4300 ج' }
+                { type: 'header', title: 'أسعار كوينز eFootball', title_en: 'eFootball Coins Rates' },
+                { id: 'ef_130', name: '130 كوين', name_en: '130 Coins', egp: 70 },
+                { id: 'ef_300', name: '300 كوين', name_en: '300 Coins', egp: 150 },
+                { id: 'ef_550', name: '550 كوين', name_en: '550 Coins', egp: 250 },
+                { id: 'ef_750', name: '750 كوين', name_en: '750 Coins', egp: 340 },
+                { id: 'ef_1040', name: '1040 كوين', name_en: '1040 Coins', egp: 450 },
+                { id: 'ef_2130', name: '2130 كوين', name_en: '2130 Coins', egp: 890 },
+                { id: 'ef_3250', name: '3250 كوين', name_en: '3250 Coins', egp: 1300 },
+                { id: 'ef_5700', name: '5700 كوين', name_en: '5700 Coins', egp: 2150 },
+                { id: 'ef_12800', name: '12800 كوين', name_en: '12800 Coins', egp: 4300 }
             ],
             roblox: [
-                { type: 'header', title: 'أسعار روبوكس Roblox' },
-                { name: '80 روبوكس', price: '60 ج' },
-                { name: '160 روبوكس', price: '120 ج' },
-                { name: '400 روبوكس', price: '240 ج' },
-                { name: '800 روبوكس', price: '480 ج' },
-                { name: '1600 روبوكس', price: '940 ج' },
-                { name: '2400 روبوكس', price: '1420 ج' },
-                { name: '3200 روبوكس', price: '1850 ج' }
+                { type: 'header', title: 'أسعار روبوكس Roblox', title_en: 'Roblox Robux Rates' },
+                { id: 'rb_80', name: '80 روبوكس', name_en: '80 Robux', egp: 60 },
+                { id: 'rb_160', name: '160 روبوكس', name_en: '160 Robux', egp: 120 },
+                { id: 'rb_400', name: '400 روبوكس', name_en: '400 Robux', egp: 240 },
+                { id: 'rb_800', name: '800 روبوكس', name_en: '800 Robux', egp: 480 },
+                { id: 'rb_1600', name: '1600 روبوكس', name_en: '1600 Robux', egp: 940 },
+                { id: 'rb_2400', name: '2400 روبوكس', name_en: '2400 Robux', egp: 1420 },
+                { id: 'rb_3200', name: '3200 روبوكس', name_en: '3200 Robux', egp: 1850 }
             ]
         };
 
         const gameDisplayNames = {
-            pubg: "ببجي",
-            freefire: "فري فاير",
-            tiktok: "تيك توك",
-            efootball: "بيس",
-            roblox: "روبوكس"
+            ar: { pubg: "ببجي", freefire: "فري فاير", tiktok: "تيك توك", efootball: "بيس", roblox: "روبوكس" },
+            en: { pubg: "PUBG Mobile", freefire: "Free Fire", tiktok: "TikTok", efootball: "eFootball", roblox: "Roblox" }
         };
 
         let currentActiveGame = 'pubg';
@@ -1142,72 +1848,302 @@
             const container = document.getElementById('pricingContentArea');
             container.innerHTML = '';
             const items = gamesData[gameKey] || [];
+            const isEn = (currentLang === 'en');
 
             items.forEach(item => {
                 if (item.type === 'header') {
                     const headerEl = document.createElement('div');
                     headerEl.className = 'section-header-pill';
-                    headerEl.innerHTML = `<i class="fa-solid fa-tag"></i> <span>${item.title}</span>`;
+                    const titleText = isEn ? (item.title_en || item.title) : item.title;
+                    headerEl.innerHTML = `<i class="fa-solid fa-tag"></i> <span>${titleText}</span>`;
                     container.appendChild(headerEl);
                 } else {
                     const row = document.createElement('div');
                     row.className = 'price-row-item';
+                    const itemName = isEn ? (item.name_en || item.name) : item.name;
+                    const usdPrice = (item.egp / USD_FIXED_RATE).toFixed(2);
+                    const priceFormatted = isEn 
+                        ? `$${usdPrice} / ${item.egp} EGP` 
+                        : `${item.egp} ج / $${usdPrice}`;
+                    const btnLabel = isEn ? 'Add +' : 'إضافة +';
+
                     row.innerHTML = `
-                        <div class="item-name">${item.name}</div>
+                        <div class="item-name">${itemName}</div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="item-price-tag">${item.price}</span>
-                            <button class="order-action-btn" onclick="orderItemViaWhatsApp('${gameDisplayNames[gameKey]}', '${item.name}', '${item.price}')">
-                                <i class="fa-brands fa-whatsapp"></i> طلب
+                            <span class="item-price-tag">${priceFormatted}</span>
+                            <button class="add-to-cart-btn" onclick="addToCart('${item.id}', '${gameKey}')">
+                                <i class="fa-solid fa-plus"></i> ${btnLabel}
                             </button>
                         </div>
                     `;
                     container.appendChild(row);
                 }
             });
+            refreshCursorHoverTargets();
         }
 
         function switchGameTab(gameKey, btnElement) {
+            playCyberClick();
             currentActiveGame = gameKey;
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
             renderPricingItems(gameKey);
         }
 
-        // إرسال الطلب برسالة واتساب مباشرة بالصيغة المطلوبة
-        function orderItemViaWhatsApp(gameName, itemName, itemPrice) {
-            const cleanPrice = itemPrice.replace('ج', '').trim();
-            const message = `السلام عليكم عايز اشحن ${gameName} باقة ${itemName} بسعر ${cleanPrice} ج`;
+        // سلة المشتريات
+        let cart = JSON.parse(localStorage.getItem('tahan_cart_items') || '[]');
+
+        function saveCart() {
+            localStorage.setItem('tahan_cart_items', JSON.stringify(cart));
+            updateCartBadge();
+            renderCartItems();
+        }
+
+        function updateCartBadge() {
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cartBadgeCount').innerText = totalCount;
+        }
+
+        function addToCart(itemId, gameKey) {
+            playSuccessSound();
+            const items = gamesData[gameKey] || [];
+            const itemObj = items.find(i => i.id === itemId);
+            if (!itemObj) return;
+
+            const existing = cart.find(i => i.id === itemId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    id: itemObj.id,
+                    gameKey: gameKey,
+                    name: itemObj.name,
+                    name_en: itemObj.name_en,
+                    egp: itemObj.egp,
+                    qty: 1
+                });
+            }
+            saveCart();
+            const isEn = (currentLang === 'en');
+            showToast(isEn ? `Added to cart: ${itemObj.name_en || itemObj.name}` : `تمت الإضافة للسلة: ${itemObj.name}`);
+        }
+
+        function updateItemQty(itemId, delta) {
+            playCyberClick();
+            const idx = cart.findIndex(i => i.id === itemId);
+            if (idx > -1) {
+                cart[idx].qty += delta;
+                if (cart[idx].qty <= 0) {
+                    cart.splice(idx, 1);
+                }
+                saveCart();
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cartItemsList');
+            const totalEgpDisplay = document.getElementById('cartTotalEgpDisplay');
+            const totalUsdDisplay = document.getElementById('cartTotalUsdDisplay');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 py-10 font-bold" data-i18n="cart_empty">${i18nTranslations[currentLang].cart_empty}</div>`;
+                totalEgpDisplay.innerText = '0 ج';
+                totalUsdDisplay.innerText = '$0.00';
+                return;
+            }
+
+            let totalEgp = 0;
+            const isEn = (currentLang === 'en');
+
+            cart.forEach(item => {
+                const itemTotal = item.egp * item.qty;
+                totalEgp += itemTotal;
+                const gameName = gameDisplayNames[currentLang][item.gameKey] || item.gameKey;
+                const displayName = isEn ? (item.name_en || item.name) : item.name;
+
+                const itemRow = document.createElement('div');
+                itemRow.className = 'cart-item-card';
+                itemRow.innerHTML = `
+                    <div style="text-align: inherit;">
+                        <div class="text-xs font-bold text-sky-400 mb-0.5">${gameName}</div>
+                        <div class="text-sm font-bold text-slate-200">${displayName}</div>
+                        <div class="text-xs font-black text-emerald-400 mt-0.5">${itemTotal} ج.م</div>
+                    </div>
+                    <div class="cart-qty-ctrl">
+                        <button class="qty-btn" onclick="updateItemQty('${item.id}', -1)">-</button>
+                        <span class="text-xs font-black text-white px-1">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
+                    </div>
+                `;
+                container.appendChild(itemRow);
+            });
+
+            const totalUsd = (totalEgp / USD_FIXED_RATE).toFixed(2);
+            totalEgpDisplay.innerText = `${totalEgp} ج`;
+            totalUsdDisplay.innerText = `$${totalUsd}`;
+            refreshCursorHoverTargets();
+        }
+
+        function checkoutViaWhatsApp() {
+            if (cart.length === 0) {
+                showToast(currentLang === 'ar' ? 'السلة فارغة، أضف باقات أولاً!' : 'Cart is empty!');
+                return;
+            }
+            playSuccessSound();
+
+            let totalEgp = 0;
+            const isEn = (currentLang === 'en');
+            let itemsText = "";
+
+            cart.forEach((item, idx) => {
+                const itemTotal = item.egp * item.qty;
+                totalEgp += itemTotal;
+                const gameName = gameDisplayNames[currentLang][item.gameKey] || item.gameKey;
+                const displayName = isEn ? (item.name_en || item.name) : item.name;
+                itemsText += `\n${idx + 1}. [${gameName}] - ${displayName} (×${item.qty}) = ${itemTotal} ج`;
+            });
+
+            const totalUsd = (totalEgp / USD_FIXED_RATE).toFixed(2);
+            let message = "";
+
+            if (currentLang === 'ar') {
+                message = `السلام عليكم ورحمة الله، عايز أطلب شحن الباقات التالية من موقع Tahan Store:${itemsText}\n\n💰 الإجمالي: ${totalEgp} ج.م ($${totalUsd})\nيرجى تأكيد الاستلام للشحن الفوري.`;
+            } else {
+                message = `Hello, I would like to order the following gaming packages from Tahan Store:${itemsText}\n\n💰 Total: ${totalEgp} EGP ($${totalUsd})\nPlease confirm the order.`;
+            }
+
             const encodedMsg = encodeURIComponent(message);
             const waUrl = `https://wa.me/${ORDERS_WHATSAPP_NUMBER}?text=${encodedMsg}`;
             window.open(waUrl, '_blank');
         }
 
-        // فتح وإغلاق نافذة الأسعار
+        // النوافذ المنبثقة
         const pricingModal = document.getElementById('pricingModal');
         function openPricingModal() {
+            playCyberClick();
             renderPricingItems(currentActiveGame);
             pricingModal.classList.add('active');
         }
         function closePricingModal() {
+            playCyberClick();
             pricingModal.classList.remove('active');
         }
         function closePricingOnOverlay(e) {
-            if (e.target === pricingModal) closePricingModal();
+            if (e.target.id === 'pricingModal') closePricingModal();
         }
 
-        // فتح وإغلاق نافذة طرق الدفع
+        const cartDrawerOverlay = document.getElementById('cartDrawerOverlay');
+        function openCartDrawer() {
+            playCyberClick();
+            renderCartItems();
+            cartDrawerOverlay.classList.add('active');
+        }
+        function closeCartDrawer() {
+            playCyberClick();
+            cartDrawerOverlay.classList.remove('active');
+        }
+        function closeCartOnOverlay(e) {
+            if (e.target.id === 'cartDrawerOverlay') closeCartDrawer();
+        }
+
         const paymentModal = document.getElementById('paymentModal');
         function openPaymentModal() {
+            playCyberClick();
             paymentModal.classList.add('active');
         }
         function closePaymentModal() {
+            playCyberClick();
             paymentModal.classList.remove('active');
         }
-        function closeModalOnOverlay(e) {
-            if (e.target === paymentModal) closePaymentModal();
+        function closePaymentOnOverlay(e) {
+            if (e.target.id === 'paymentModal') closePaymentModal();
         }
 
-        // نظام محاولة قراءة الصورة بجميع الصيغ تلقائياً
+        // محرك نافذة المشاركة ورمز الـ QR
+        const shareModal = document.getElementById('shareModal');
+        function openShareModal() {
+            playCyberClick();
+            const currentUrl = window.location.href;
+            document.getElementById('shareUrlInput').value = currentUrl;
+            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
+            shareModal.classList.add('active');
+        }
+
+        function closeShareModal() {
+            playCyberClick();
+            shareModal.classList.remove('active');
+        }
+
+        function closeShareOnOverlay(e) {
+            if (e.target.id === 'shareModal') closeShareModal();
+        }
+
+        function copyCurrentSiteUrl() {
+            const currentUrl = window.location.href;
+            copyToClipboard(currentUrl, 'رابط المتجر', 'Store URL');
+        }
+
+        function shareToWhatsApp() {
+            playCyberClick();
+            const text = encodeURIComponent(`شحن ألعاب فوري ومضمون مع Hassan El-Tahan:\n${window.location.href}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        }
+
+        function shareToTelegram() {
+            playCyberClick();
+            const text = encodeURIComponent(`متجر شحن الألعاب المعتمد - Hassan El-Tahan`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${text}`, '_blank');
+        }
+
+        function shareNative() {
+            playCyberClick();
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Hassan El-Tahan | Portfolio & Gaming Store',
+                    text: 'شحن ألعاب فوري ومضمون (ببجي، فري فاير، تيك توك، بيس، روبوكس)',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                copyCurrentSiteUrl();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePricingModal();
+                closeCartDrawer();
+                closePaymentModal();
+                closeShareModal();
+            }
+        });
+
+        // عداد الزوار التلقائي
+        async function initVisitorCounter() {
+            const counterDisplay = document.getElementById('visitorCountDisplay');
+            const BASE_OFFSET = 1250;
+            const COUNTER_KEY = 'tahan_store_shop_visits_v1';
+            
+            try {
+                const res = await fetch(`https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`);
+                const data = await res.json();
+                if (data && data.value) {
+                    const totalVisits = BASE_OFFSET + parseInt(data.value);
+                    counterDisplay.innerText = Number(totalVisits).toLocaleString();
+                    localStorage.setItem('tahan_cached_views', totalVisits);
+                } else {
+                    throw new Error('Fallback');
+                }
+            } catch (err) {
+                let localVisits = parseInt(localStorage.getItem('tahan_cached_views')) || (BASE_OFFSET + 14);
+                localVisits += 1;
+                localStorage.setItem('tahan_cached_views', localVisits);
+                counterDisplay.innerText = Number(localVisits).toLocaleString();
+            }
+        }
+        initVisitorCounter();
+
+        // صورة البروفايل
         const formats = ['me.jpeg', 'me.jpg', 'me.png', 'me'];
         let currentFormatIndex = 0;
         function tryNextFormat(imgElement) {
@@ -1217,7 +2153,6 @@
             }
         }
 
-        // تعديل الصورة بالـ PIN
         const hiddenInput = document.getElementById('hiddenPhotoInput');
         const avatarImg = document.getElementById('avatarPreview');
 
@@ -1226,12 +2161,14 @@
         }
 
         function requestPhotoChange() {
-            const enteredPin = prompt("أدخل رمز المرور السري (PIN) لتغيير الصورة الشخصية:");
+            playCyberClick();
+            const promptText = currentLang === 'ar' ? "أدخل رمز المرور السري (PIN) لتغيير الصورة الشخصية:" : "Enter PIN to update profile picture:";
+            const enteredPin = prompt(promptText);
             if (enteredPin === null) return;
             if (enteredPin.trim() === ADMIN_PIN) {
                 hiddenInput.click();
             } else {
-                alert("رمز المرور غير صحيح! هذه الصلاحية لصاحب الملف فقط.");
+                alert(currentLang === 'ar' ? "رمز المرور غير صحيح! هذه الصلاحية لصاحب الملف فقط." : "Incorrect PIN! Access denied.");
             }
         }
 
@@ -1247,18 +2184,18 @@
             }
         });
 
-        // تعديل الحالة بالـ PIN
+        // شارة الحالة
         let isOnline = localStorage.getItem('hassan_status') !== 'offline';
         function updateStatusUI() {
             const text = document.getElementById('statusText');
             const circle = document.getElementById('statusCircle');
             if (isOnline) {
-                text.innerText = "متاح للتواصل أونلاين";
+                text.innerText = i18nTranslations[currentLang].onlineStatus;
                 text.style.color = "#34d399";
                 circle.style.background = "#10b981";
                 circle.style.boxShadow = "0 0 10px #10b981";
             } else {
-                text.innerText = "غير متاح حالياً";
+                text.innerText = i18nTranslations[currentLang].offlineStatus;
                 text.style.color = "#f87171";
                 circle.style.background = "#ef4444";
                 circle.style.boxShadow = "0 0 10px #ef4444";
@@ -1266,23 +2203,28 @@
         }
 
         function requestAdminToggle() {
-            const enteredPin = prompt("أدخل رمز المرور السري (PIN) لتعديل الحالة:");
+            playCyberClick();
+            const promptText = currentLang === 'ar' ? "أدخل رمز المرور السري (PIN) لتعديل الحالة:" : "Enter PIN to change status:";
+            const enteredPin = prompt(promptText);
             if (enteredPin === null) return;
             if (enteredPin.trim() === ADMIN_PIN) {
                 isOnline = !isOnline;
                 localStorage.setItem('hassan_status', isOnline ? 'online' : 'offline');
                 updateStatusUI();
             } else {
-                alert("رمز المرور غير صحيح! هذه الصلاحية لصاحب الملف فقط.");
+                alert(currentLang === 'ar' ? "رمز المرور غير صحيح! هذه الصلاحية لصاحب الملف فقط." : "Incorrect PIN! Access denied.");
             }
         }
 
-        updateStatusUI();
+        setLanguage(currentLang);
+        updateCartBadge();
 
-        // نظام النسخ السريع وإظهار الـ Toast
-        function copyToClipboard(text, label) {
+        function copyToClipboard(text, labelAr, labelEn) {
+            playSuccessSound();
+            const label = currentLang === 'ar' ? labelAr : (labelEn || labelAr);
+            const successMsg = currentLang === 'ar' ? `تم نسخ ${label}: ${text}` : `${label} copied: ${text}`;
             navigator.clipboard.writeText(text).then(() => {
-                showToast(`تم نسخ ${label}: ${text}`);
+                showToast(successMsg);
             }).catch(() => {
                 const input = document.createElement('input');
                 input.value = text;
@@ -1290,7 +2232,7 @@
                 input.select();
                 document.execCommand('copy');
                 document.body.removeChild(input);
-                showToast(`تم نسخ ${label}: ${text}`);
+                showToast(successMsg);
             });
         }
 
@@ -1304,7 +2246,7 @@
             }, 2600);
         }
 
-        // خلفية الجزيئات الكونية
+        // خلفية الجزيئات المتحركة
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -1312,9 +2254,8 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            init();
+            initParticles();
         }
-
         window.addEventListener('resize', resizeCanvas);
 
         class Dot {
@@ -1332,14 +2273,15 @@
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
             }
             draw() {
-                ctx.fillStyle = 'rgba(99, 102, 241, 0.4)';
+                const computedColor = getComputedStyle(document.documentElement).getPropertyValue('--glow-color-1') || 'rgba(99, 102, 241, 0.45)';
+                ctx.fillStyle = computedColor.trim();
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        function init() {
+        function initParticles() {
             particles = [];
             const count = Math.floor((canvas.width * canvas.height) / 18000);
             for (let i = 0; i < count; i++) {
@@ -1347,17 +2289,17 @@
             }
         }
 
-        function animate() {
+        function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].draw();
             }
-            requestAnimationFrame(animate);
+            requestAnimationFrame(animateParticles);
         }
 
         resizeCanvas();
-        animate();
+        animateParticles();
     </script>
 </body>
 </html>
